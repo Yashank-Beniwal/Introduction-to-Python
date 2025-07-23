@@ -1,0 +1,83 @@
+### In your third assignment, you will develop a tool to analyze a log file and identify the attackers' IP Address. You are given a series of log files from an internal application. You will write a tool to analyze the logs and generate reports based on different thresholds of sensitivity.
+
+## Situation Brief
+After analyzing the same log file every day looking for signs of attackers you realize the truth, that manually analyzing log files is time consuming and are less accurate then that writing a tool to do it manually. To that end you are writing a tool to analyze the authentication logs of a server that is running on your internal network.
+
+## Tool Requirements
+You must develop a tool called "analyze_log.py". It will take the following two command line arguments:
+
+- PATH: The first command line argument is the path to the log file you are going to analyze.
+- THRESHOLD: The second command line argument is an integer.
+
+If an IP Address appear on a line in the log in argument PATH along with the string "LOGIN FAILED" then you will count count it. Any IP Address that appears in the log file more than the integer THRESHOLD you will print.
+
+#!/usr/bin/env python3
+import sys
+import os
+
+def get_ip_from_line(line):
+    """Given a single line of a log file, return the IP address"""
+    # Look for IP prefixes "10." or "192." and pick the earliest occurrence
+    idx10 = line.find("10.")
+    idx192 = line.find("192.")
+    if idx10 == -1 and idx192 == -1:
+        return ""  # no IP prefix found
+    # Determine the start index of the IP
+    if idx10 == -1:
+        start = idx192
+    elif idx192 == -1:
+        start = idx10
+    else:
+        start = min(idx10, idx192)
+    # Find end of IP address (colon before port or whitespace)
+    colon = line.find(':', start)
+    if colon != -1:
+        end = colon
+    else:
+        # No port, end at next whitespace
+        end = len(line)
+        for i in range(start, len(line)):
+            if line[i].isspace():
+                end = i
+                break
+    return line[start:end]
+
+
+def log_to_dict(path_to_log_file):
+    """Given a path to a log file, return a dictionary of IP addresses and the number of times they appear on lines with "LOGIN FAILED"."""
+    ip_counts = {}
+    # Open and read the file line by line
+    with open(path_to_log_file, 'r') as f:
+        for line in f:
+            if "LOGIN FAILED" in line:
+                ip = get_ip_from_line(line)
+                if ip:
+                    ip_counts[ip] = ip_counts.get(ip, 0) + 1
+    return ip_counts
+
+
+def main(path_to_log_file, threshold):
+    """Open the log file and analyze the log"""
+    # Check if file exists
+    if not os.path.isfile(path_to_log_file):
+        return "FILE NOT FOUND"
+    # Build dictionary of failed-login counts by IP
+    ip_counts = log_to_dict(path_to_log_file)
+    # Collect IPs with counts greater than or equal to threshold
+    results = [ip for ip, count in ip_counts.items() if count >= threshold]
+    if not results:
+        return "NO IP FOUND"
+    # Return sorted list of IPs
+    return sorted(results)
+
+
+if __name__ == "__main__":
+    file_path = sys.argv[1]
+    threshold = int(sys.argv[2])
+    result = main(file_path, threshold)
+    print(f"The following IP Addresses were found more than {threshold} time.")
+    if result == "NO IP FOUND":
+        print(result)
+    else:
+        for each_ip in result:
+            print(each_ip)
