@@ -1,18 +1,3 @@
-### In your third assignment, you will develop a tool to analyze a log file and identify the attackers' IP Address. You are given a series of log files from an internal application. You will write a tool to analyze the logs and generate reports based on different thresholds of sensitivity.
-
-## Situation Brief
-After analyzing the same log file every day looking for signs of attackers you realize the truth, that manually analyzing log files is time consuming and are less accurate then that writing a tool to do it manually. To that end you are writing a tool to analyze the authentication logs of a server that is running on your internal network.
-
-## Tool Requirements
-You must develop a tool called "analyze_log.py". It will take the following two command line arguments:
-
-- PATH: The first command line argument is the path to the log file you are going to analyze.
-- THRESHOLD: The second command line argument is an integer.
-
-If an IP Address appear on a line in the log in argument PATH along with the string "LOGIN FAILED" then you will count count it. Any IP Address that appears in the log file more than the integer THRESHOLD you will print.
-
-############### CODE ###############
-
 #!/usr/bin/env python3
 import sys
 import os
