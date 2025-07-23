@@ -11,6 +11,8 @@ You must develop a tool called "analyze_log.py". It will take the following two 
 
 If an IP Address appear on a line in the log in argument PATH along with the string "LOGIN FAILED" then you will count count it. Any IP Address that appears in the log file more than the integer THRESHOLD you will print.
 
+############### CODE ###############
+
 #!/usr/bin/env python3
 import sys
 import os
